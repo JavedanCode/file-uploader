@@ -1,0 +1,52 @@
+{
+  "name": "file-uploader",
+  "version": "1.0.0",
+  "description": "File uploader cloud based storage web application",
+  "homepage": "https://github.com/JavedanCode/file-uploader#readme",
+  "bugs": {
+    "url": "https://github.com/JavedanCode/file-uploader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavedanCode/file-uploader.git"
+  },
+  "license": "ISC",
+  "author": "JavedanCode",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "build": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "generate": "prisma generate"
+  },
+  "prisma": {
+    "schema": "./db/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@quixo3/prisma-session-store": "^3.1.21",
+    "@supabase/supabase-js": "^2.57.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.0",
+    "http-errors": "^2.0.0",
+    "mime-types": "^2.1.35",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prisma": "^6.19.3"
+  }
+}
