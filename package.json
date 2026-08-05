@@ -39,6 +39,7 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.0",
     "http-errors": "^2.0.0",
+    "method-override": "^3.0.0",
     "mime-types": "^2.1.35",
     "multer": "^2.0.2",
     "passport": "^0.7.0",
