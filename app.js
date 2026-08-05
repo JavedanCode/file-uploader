@@ -11,6 +11,13 @@ const prisma = require("./config/prisma");
 
 const app = express();
 
+const indexRouter = require("./routes/index");
+const authRouter = require("./routes/auth");
+const folderRouter = require("./routes/folder");
+const fileRouter = require("./routes/file");
+
+const methodOverride = require("method-override");
+
 //=========================================
 //           MIDDLEWARE
 //=========================================
@@ -18,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("public"));
+
+app.use(methodOverride("_method"));
 
 //=========================================
 //           SESSION
