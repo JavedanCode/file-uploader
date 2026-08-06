@@ -1,0 +1,179 @@
+.register-page {
+  width: min(1200px, 92vw);
+
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 1fr 480px;
+
+  gap: 7rem;
+
+  align-items: center;
+}
+
+.register-hero h1 {
+  font-size: clamp(3.5rem, 6vw, 5.5rem);
+
+  font-weight: 700;
+
+  letter-spacing: -0.08em;
+
+  margin-bottom: 0.5rem;
+}
+
+.register-hero span {
+  font-weight: 300;
+}
+
+.register-hero p {
+  color: var(--text-muted);
+
+  margin-bottom: 2.5rem;
+}
+
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1rem;
+
+  margin-bottom: 2rem;
+}
+
+.oauth-buttons button {
+  width: 100%;
+}
+
+.login-link {
+  color: var(--text-muted);
+}
+
+.login-link a {
+  color: white;
+}
+
+.register-panel {
+  position: relative;
+
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+
+  padding: 3rem;
+
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+}
+
+.register-panel::before,
+.register-panel::after {
+  content: "";
+
+  position: absolute;
+
+  width: 40px;
+  height: 40px;
+}
+
+.register-panel::before {
+  left: -1px;
+  top: -1px;
+
+  border-left: 4px solid white;
+  border-top: 4px solid white;
+}
+
+.register-panel::after {
+  right: -1px;
+  bottom: -1px;
+
+  border-right: 4px solid white;
+  border-bottom: 4px solid white;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.register-form h2 {
+  margin-bottom: 2rem;
+
+  font-size: 2rem;
+}
+
+.register-field {
+  margin-bottom: 1.5rem;
+}
+
+.register-submit {
+  margin-top: 1rem;
+
+  width: 100%;
+}
+
+.register-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.register-logo {
+  font-size: clamp(4rem, 7vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  margin-bottom: 1rem;
+}
+
+.register-logo span {
+  font-weight: 300;
+}
+
+.register-tagline {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+  line-height: 1.7;
+}
+
+.register-oauth {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  max-width: 340px;
+}
+
+.register-oauth .btn {
+  width: 100%;
+}
+
+.register-login {
+  margin-top: 2rem;
+  color: var(--text-muted);
+}
+
+.register-login a {
+  color: var(--text);
+}
+
+@media (max-width: 950px) {
+  .register-page {
+    grid-template-columns: 1fr;
+
+    gap: 4rem;
+
+    padding: 4rem 0;
+  }
+
+  .register-hero {
+    text-align: center;
+  }
+
+  .register-hero h1 {
+    font-size: 3rem;
+  }
+
+  .register-panel {
+    width: 100%;
+  }
+}

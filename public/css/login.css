@@ -1,0 +1,148 @@
+.login-page {
+  width: min(1200px, 92vw);
+
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 480px 1fr;
+
+  gap: 7rem;
+
+  align-items: center;
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-logo {
+  font-size: clamp(4rem, 7vw, 6rem);
+
+  font-weight: 700;
+
+  letter-spacing: -0.08em;
+
+  margin-bottom: 1rem;
+}
+
+.login-logo span {
+  font-weight: 300;
+}
+
+.login-tagline {
+  color: var(--text-muted);
+
+  font-size: 1.1rem;
+
+  line-height: 1.7;
+
+  margin-bottom: 3rem;
+}
+
+.login-oauth {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1rem;
+
+  max-width: 340px;
+}
+
+.login-oauth .btn {
+  width: 100%;
+}
+
+.signup-link {
+  margin-top: 2rem;
+
+  color: var(--text-muted);
+}
+
+.signup-link a {
+  color: white;
+}
+
+.login-panel {
+  position: relative;
+
+  border: 1px solid var(--border);
+
+  background: var(--surface);
+
+  padding: 3rem;
+
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+}
+
+.login-panel::before,
+.login-panel::after {
+  content: "";
+
+  position: absolute;
+
+  width: 40px;
+  height: 40px;
+}
+
+.login-panel::before {
+  left: -1px;
+  top: -1px;
+
+  border-left: 4px solid white;
+  border-top: 4px solid white;
+}
+
+.login-panel::after {
+  right: -1px;
+  bottom: -1px;
+
+  border-right: 4px solid white;
+  border-bottom: 4px solid white;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form h2 {
+  margin-bottom: 2rem;
+
+  font-size: 2rem;
+}
+
+.login-field {
+  margin-bottom: 1.5rem;
+}
+
+.login-submit {
+  margin-top: 1rem;
+
+  width: 100%;
+}
+
+@media (max-width: 950px) {
+  .login-page {
+    grid-template-columns: 1fr;
+
+    gap: 4rem;
+
+    padding: 4rem 0;
+  }
+
+  .login-brand {
+    order: -1;
+
+    text-align: center;
+  }
+
+  .login-logo {
+    font-size: 3rem;
+  }
+
+  .login-panel {
+    width: 100%;
+  }
+}
