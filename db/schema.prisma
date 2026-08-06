@@ -10,27 +10,33 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique
-  email     String   @unique
-  password  String
+  id             String   @id @default(uuid())
 
-  folders   Folder[]
-  files     File[]
+  username       String?  @unique
+  email          String   @unique
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  password       String?
+
+  googleId       String?  @unique
+  githubId       String?  @unique
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  folders        Folder[]
+  files          File[]
 }
 
 model Folder {
   id        String   @id @default(uuid())
+
   name      String
 
   ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner     User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   parentId  String?
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  parent    Folder? @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Folder[] @relation("FolderHierarchy")
 
   files     File[]
@@ -42,6 +48,8 @@ model Folder {
 
   @@index([ownerId])
   @@index([parentId])
+
+  @@unique([ownerId, parentId, name])
 }
 
 model File {
@@ -77,6 +85,15 @@ model ShareLink {
   expiresAt  DateTime
 
   createdAt  DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 
   @@index([expiresAt])
 }
