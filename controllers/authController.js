@@ -1,8 +1,23 @@
+const passport = require("passport");
 const bcrypt = require("bcryptjs");
-const prisma = require("../config/prisma");
+
+const authQueries = require("../db/queries/authQueries");
+
+const renderLogin = (res, data = {}) => {
+  return res.render("auth/login", {
+    title: "Login",
+    errors: [],
+    oldInput: {},
+    ...data,
+  });
+};
 
 const registerGet = (req, res) => {
-  res.render("auth/register");
+  res.render("auth/register", {
+    title: "Register",
+    errors: [],
+    oldInput: {},
+  });
 };
 
 const registerPost = async (req, res, next) => {
@@ -11,22 +26,50 @@ const registerPost = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-      },
+    await authQueries.createUserQuery({
+      username,
+      email,
+      password: hashedPassword,
     });
 
-    res.redirect("/auth/login");
+    return res.redirect("/auth/login");
   } catch (err) {
     next(err);
   }
 };
 
 const loginGet = (req, res) => {
-  res.render("auth/login");
+  renderLogin(res);
+};
+
+const loginPost = (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      return renderLogin(res, {
+        errors: [
+          {
+            path: "login",
+            msg: info.message,
+          },
+        ],
+        oldInput: {
+          username: req.body.username,
+        },
+      });
+    }
+
+    req.login(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      return res.redirect("/");
+    });
+  })(req, res, next);
 };
 
 const logout = (req, res, next) => {
@@ -49,5 +92,6 @@ module.exports = {
   registerGet,
   registerPost,
   loginGet,
+  loginPost,
   logout,
 };
