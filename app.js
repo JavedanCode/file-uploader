@@ -1,30 +1,45 @@
-require("dotenv").config();
-
 const express = require("express");
-const session = require("express-session");
-const passport = require("./config/passport");
+const expressSession = require("express-session");
 
-const PrismaSessionStore =
-  require("@quixo3/prisma-session-store").PrismaSessionStore;
-
+const passport = require("passport");
+const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const prisma = require("./config/prisma");
 
-const app = express();
-
-const indexRouter = require("./routes/index");
-const authRouter = require("./routes/auth");
+const authRouter = require("./routes/authRoutes");
 const folderRouter = require("./routes/folder");
 const fileRouter = require("./routes/file");
+const shareRouter = require("./routes/shareRoutes");
 
+require("dotenv").config();
+require("./config/passport");
+
+const path = require("node:path");
+const PORT = process.env.PORT || 3000;
 const methodOverride = require("method-override");
+
+const app = express();
 
 //=========================================
 //           MIDDLEWARE
 //=========================================
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.set("trust proxy", 1);
 
-app.use(express.static("public"));
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "10mb",
+  }),
+);
+
+app.use(
+  express.json({
+    limit: "10mb",
+  }),
+);
 
 app.use(methodOverride("_method"));
 
@@ -32,15 +47,19 @@ app.use(methodOverride("_method"));
 //           SESSION
 //=========================================
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
+  expressSession({
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax",
+    },
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24,
-    },
     store: new PrismaSessionStore(prisma, {
-      checkPeriod: 1000 * 60 * 2,
+      checkPeriod: 2 * 60 * 1000,
+      dbRecordIdFunction: undefined,
       dbRecordIdIsSessionId: true,
     }),
   }),
@@ -49,21 +68,15 @@ app.use(
 //=========================================
 //           PASSPORT
 //=========================================
-app.use(passport.initialize());
 app.use(passport.session());
-
-app.use((req, res, next) => {
-  res.locals.currentUser = req.user;
-  next();
-});
 
 //=========================================
 //           ROUTES
 //=========================================
-app.use("/", indexRouter);
 app.use("/auth", authRouter);
 app.use("/folders", folderRouter);
 app.use("/files", fileRouter);
+app.use("/", shareRouter);
 
 //=========================================
 //           ERROR HANDLER
@@ -71,13 +84,21 @@ app.use("/files", fileRouter);
 app.use((err, req, res, next) => {
   console.error(err);
 
-  res.status(err.status || 500).send(err.message);
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.status || 500);
+
+  res.render("500", {
+    title: "Server Error",
+    error: process.env.NODE_ENV === "development" ? err.message : null,
+  });
 });
 
 //=========================================
 //           LISTEN
 //=========================================
-const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
