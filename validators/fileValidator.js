@@ -4,23 +4,41 @@ const fileQueries = require("../db/queries/fileQueries");
 const folderQueries = require("../db/queries/folderQueries");
 
 // =====================================
+// HELPERS
+// =====================================
+
+const ensureFileExists = async (id, userId) => {
+  const file = await fileQueries.fileExistsQuery(id, userId);
+
+  if (!file) {
+    throw new Error("File not found.");
+  }
+
+  return true;
+};
+
+const ensureFolderExists = async (folderId, userId) => {
+  if (!folderId) {
+    return true;
+  }
+
+  const folder = await folderQueries.folderExistsQuery(folderId, userId);
+
+  if (!folder) {
+    throw new Error("Invalid folder.");
+  }
+
+  return true;
+};
+
+// =====================================
 // UPLOAD
 // =====================================
 
 const uploadFileValidation = [
-  body("folderId").custom(async (folderId, { req }) => {
-    if (!folderId) {
-      return true;
-    }
-
-    const exists = await folderQueries.folderExistsQuery(folderId, req.user.id);
-
-    if (!exists) {
-      throw new Error("Invalid folder.");
-    }
-
-    return true;
-  }),
+  body("folderId").custom((folderId, { req }) =>
+    ensureFolderExists(folderId, req.user.id),
+  ),
 
   body().custom((value, { req }) => {
     if (!req.file) {
@@ -36,21 +54,14 @@ const uploadFileValidation = [
 // =====================================
 
 const renameFileValidation = [
-  param("id").custom(async (id, { req }) => {
-    const exists = await fileQueries.fileExistsQuery(id, req.user.id);
-
-    if (!exists) {
-      throw new Error("File not found.");
-    }
-
-    return true;
-  }),
+  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
 
   body("name")
     .trim()
     .escape()
     .notEmpty()
     .withMessage("File name is required.")
+    .bail()
     .isLength({ max: 100 })
     .withMessage("File name cannot exceed 100 characters."),
 ];
@@ -60,15 +71,7 @@ const renameFileValidation = [
 // =====================================
 
 const deleteFileValidation = [
-  param("id").custom(async (id, { req }) => {
-    const exists = await fileQueries.fileExistsQuery(id, req.user.id);
-
-    if (!exists) {
-      throw new Error("File not found.");
-    }
-
-    return true;
-  }),
+  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
 ];
 
 // =====================================
@@ -76,23 +79,12 @@ const deleteFileValidation = [
 // =====================================
 
 const fileParamValidation = [
-  param("id").custom(async (id, { req }) => {
-    const exists = await fileQueries.fileExistsQuery(id, req.user.id);
-
-    if (!exists) {
-      throw new Error("File not found.");
-    }
-
-    return true;
-  }),
+  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
 ];
 
 module.exports = {
   uploadFileValidation,
-
   renameFileValidation,
-
   deleteFileValidation,
-
   fileParamValidation,
 };
