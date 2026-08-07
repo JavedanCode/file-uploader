@@ -9,6 +9,8 @@ const {
   fileParamValidation,
 } = require("../validators/fileValidator");
 
+const buildDashboardData = require("../utils/buildDashboardData");
+
 const handleValidationErrors = require("../middleware/handleValidationErrors");
 const { uploadSingle } = require("../middleware/upload");
 const isAuthenticated = require("../middleware/isAuthenticated");
@@ -16,15 +18,22 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 const router = Router();
 
 // =====================================
+// AUTH
+// =====================================
+
+router.use(isAuthenticated);
+
+// =====================================
 // CREATE
 // =====================================
 
 router.post(
   "/",
-  isAuthenticated,
   uploadSingle,
   uploadFileValidation,
-  handleValidationErrors("folders/index"),
+  handleValidationErrors("dashboard", (req) =>
+    buildDashboardData(req.user.id, req.body.folderId || null),
+  ),
   fileController.uploadFile,
 );
 
@@ -34,7 +43,6 @@ router.post(
 
 router.get(
   "/:id",
-  isAuthenticated,
   fileParamValidation,
   handleValidationErrors("404"),
   fileController.getFileDetails,
@@ -42,7 +50,6 @@ router.get(
 
 router.get(
   "/:id/download",
-  isAuthenticated,
   fileParamValidation,
   handleValidationErrors("404"),
   fileController.downloadFile,
@@ -54,9 +61,10 @@ router.get(
 
 router.patch(
   "/:id",
-  isAuthenticated,
   renameFileValidation,
-  handleValidationErrors("folders/index"),
+  handleValidationErrors("dashboard", (req) =>
+    buildDashboardData(req.user.id, req.file.folder?.id ?? null),
+  ),
   fileController.renameFile,
 );
 
@@ -66,9 +74,10 @@ router.patch(
 
 router.delete(
   "/:id",
-  isAuthenticated,
   deleteFileValidation,
-  handleValidationErrors("folders/index"),
+  handleValidationErrors("dashboard", (req) =>
+    buildDashboardData(req.user.id, req.file.folder?.id ?? null),
+  ),
   fileController.deleteFile,
 );
 
