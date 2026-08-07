@@ -1,4 +1,16 @@
 const folderQueries = require("../db/queries/folderQueries");
+const buildDashboardData = require("../utils/buildDashboardData");
+
+// =====================================
+// HELPER
+// =====================================
+const redirectToParent = (res, parentId) => {
+  if (parentId) {
+    return res.redirect(`/folder/${parentId}`);
+  }
+
+  return res.redirect("/");
+};
 
 // =====================================
 // ROOT
@@ -6,19 +18,11 @@ const folderQueries = require("../db/queries/folderQueries");
 
 const getRoot = async (req, res, next) => {
   try {
-    const folders = await folderQueries.getRootFoldersQuery(req.user.id);
+    const data = await buildDashboardData(req.user.id);
 
-    return res.render("folders/index", {
-      title: "My Drive",
-      folders,
-      files: [],
-      currentFolder: null,
-
-      errors: [],
-      oldInput: {},
-    });
+    return res.render("dashboard", data);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -28,30 +32,17 @@ const getRoot = async (req, res, next) => {
 
 const getFolder = async (req, res, next) => {
   try {
-    const folder = await folderQueries.getFolderContentsQuery(
-      req.params.id,
-      req.user.id,
-    );
+    const data = await buildDashboardData(req.user.id, req.params.id);
 
-    if (!folder) {
+    if (!data) {
       return res.status(404).render("404", {
         title: "Not Found",
       });
     }
 
-    return res.render("folders/index", {
-      title: folder.name,
-
-      folders: folder.children,
-      files: folder.files,
-
-      currentFolder: folder,
-
-      errors: [],
-      oldInput: {},
-    });
+    return res.render("dashboard", data);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -69,13 +60,9 @@ const createFolder = async (req, res, next) => {
       parentId: parentId || null,
     });
 
-    if (parentId) {
-      return res.redirect(`/folders/${parentId}`);
-    }
-
-    return res.redirect("/folders");
+    return redirectToParent(res, parentId);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -85,11 +72,16 @@ const createFolder = async (req, res, next) => {
 
 const renameFolder = async (req, res, next) => {
   try {
-    await folderQueries.renameFolderQuery(req.params.id, req.body.name);
+    const folder = await folderQueries.getFolderByIdQuery(
+      req.params.id,
+      req.user.id,
+    );
 
-    return res.redirect("back");
+    await folderQueries.renameFolderQuery(folder.id, req.body.name);
+
+    return redirectToParent(res, folder.parentId);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -104,15 +96,11 @@ const deleteFolder = async (req, res, next) => {
       req.user.id,
     );
 
-    await folderQueries.deleteFolderQuery(req.params.id);
+    await folderQueries.deleteFolderQuery(folder.id);
 
-    if (folder.parentId) {
-      return res.redirect(`/folders/${folder.parentId}`);
-    }
-
-    return res.redirect("/folders");
+    return redirectToParent(res, folder.parentId);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
