@@ -6,24 +6,26 @@ const folderQueries = require("../db/queries/folderQueries");
 // HELPERS
 // =====================================
 
-const ensureFolderExists = async (id, userId) => {
-  const folder = await folderQueries.folderExistsQuery(id, userId);
+const ensureFolderExists = async (id, req) => {
+  const folder = await folderQueries.getFolderByIdQuery(id, req.user.id);
 
   if (!folder) {
     throw new Error("Folder not found.");
   }
 
+  req.folder = folder;
+
   return true;
 };
 
-const ensureParentFolderExists = async (parentId, userId) => {
+const ensureParentFolderExists = async (parentId, ownerId) => {
   if (!parentId) {
     return true;
   }
 
-  const folder = await folderQueries.folderExistsQuery(parentId, userId);
+  const exists = await folderQueries.folderExistsQuery(parentId, ownerId);
 
-  if (!folder) {
+  if (!exists) {
     throw new Error("Invalid parent folder.");
   }
 
@@ -68,7 +70,7 @@ const createFolderValidation = [
 // =====================================
 
 const renameFolderValidation = [
-  param("id").custom((id, { req }) => ensureFolderExists(id, req.user.id)),
+  param("id").custom((id, { req }) => ensureFolderExists(id, req)),
 
   body("name")
     .trim()
@@ -80,10 +82,7 @@ const renameFolderValidation = [
     .withMessage("Folder name cannot exceed 50 characters.")
     .bail()
     .custom(async (name, { req }) => {
-      const folder = await folderQueries.getFolderByIdQuery(
-        req.params.id,
-        req.user.id,
-      );
+      const folder = req.folder;
 
       const exists = await folderQueries.folderNameExistsExceptQuery(
         req.user.id,
@@ -105,7 +104,7 @@ const renameFolderValidation = [
 // =====================================
 
 const deleteFolderValidation = [
-  param("id").custom((id, { req }) => ensureFolderExists(id, req.user.id)),
+  param("id").custom((id, { req }) => ensureFolderExists(id, req)),
 ];
 
 module.exports = {
