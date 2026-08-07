@@ -72,10 +72,7 @@ const createFolder = async (req, res, next) => {
 
 const renameFolder = async (req, res, next) => {
   try {
-    const folder = await folderQueries.getFolderByIdQuery(
-      req.params.id,
-      req.user.id,
-    );
+    const folder = req.folder;
 
     await folderQueries.renameFolderQuery(folder.id, req.body.name);
 
@@ -91,10 +88,7 @@ const renameFolder = async (req, res, next) => {
 
 const deleteFolder = async (req, res, next) => {
   try {
-    const folder = await folderQueries.getFolderByIdQuery(
-      req.params.id,
-      req.user.id,
-    );
+    const folder = req.folder;
 
     await folderQueries.deleteFolderQuery(folder.id);
 
