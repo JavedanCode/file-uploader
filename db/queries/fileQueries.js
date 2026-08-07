@@ -21,26 +21,26 @@ const getFileByIdQuery = async (id, ownerId) => {
       ownerId,
     },
 
-    include: {
+    select: {
+      id: true,
+
+      name: true,
+      originalName: true,
+
+      path: true,
+      url: true,
+
+      mimeType: true,
+      size: true,
+
+      createdAt: true,
+
       folder: {
         select: {
           id: true,
           name: true,
         },
       },
-    },
-  });
-};
-
-const getFilesInFolderQuery = async (folderId, ownerId) => {
-  return prisma.file.findMany({
-    where: {
-      folderId,
-      ownerId,
-    },
-
-    orderBy: {
-      name: "asc",
     },
   });
 };
@@ -90,10 +90,14 @@ const deleteFileQuery = async (id) => {
 // =====================================
 
 const fileExistsQuery = async (id, ownerId) => {
-  return prisma.file.count({
+  return prisma.file.findFirst({
     where: {
       id,
       ownerId,
+    },
+
+    select: {
+      id: true,
     },
   });
 };
@@ -102,7 +106,6 @@ module.exports = {
   createFileQuery,
 
   getFileByIdQuery,
-  getFilesInFolderQuery,
 
   updateFileUrlQuery,
   renameFileQuery,
