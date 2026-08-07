@@ -7,22 +7,24 @@ const folderQueries = require("../db/queries/folderQueries");
 // HELPERS
 // =====================================
 
-const ensureFileExists = async (id, userId) => {
-  const file = await fileQueries.fileExistsQuery(id, userId);
+const ensureFileExists = async (id, req) => {
+  const file = await fileQueries.getFileByIdQuery(id, req.user.id);
 
   if (!file) {
     throw new Error("File not found.");
   }
 
+  req.file = file;
+
   return true;
 };
 
-const ensureFolderExists = async (folderId, userId) => {
+const ensureFolderExists = async (folderId, ownerId) => {
   if (!folderId) {
     return true;
   }
 
-  const folder = await folderQueries.folderExistsQuery(folderId, userId);
+  const folder = await folderQueries.folderExistsQuery(folderId, ownerId);
 
   if (!folder) {
     throw new Error("Invalid folder.");
@@ -54,7 +56,7 @@ const uploadFileValidation = [
 // =====================================
 
 const renameFileValidation = [
-  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
+  param("id").custom((id, { req }) => ensureFileExists(id, req)),
 
   body("name")
     .trim()
@@ -71,7 +73,7 @@ const renameFileValidation = [
 // =====================================
 
 const deleteFileValidation = [
-  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
+  param("id").custom((id, { req }) => ensureFileExists(id, req)),
 ];
 
 // =====================================
@@ -79,7 +81,7 @@ const deleteFileValidation = [
 // =====================================
 
 const fileParamValidation = [
-  param("id").custom((id, { req }) => ensureFileExists(id, req.user.id)),
+  param("id").custom((id, { req }) => ensureFileExists(id, req)),
 ];
 
 module.exports = {
