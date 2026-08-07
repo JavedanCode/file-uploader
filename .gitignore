@@ -4,6 +4,8 @@ node_modules
 
 generated
 
+uploads
+
 # Logs
 logs
 *.log
