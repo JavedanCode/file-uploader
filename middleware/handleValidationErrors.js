@@ -1,18 +1,25 @@
 const { validationResult } = require("express-validator");
 
-const handleValidationErrors = (view, extraData = {}) => {
-  return (req, res, next) => {
+const handleValidationErrors = (view, buildData = null) => {
+  return async (req, res, next) => {
     const errors = validationResult(req);
 
     if (errors.isEmpty()) {
       return next();
     }
 
-    return res.status(400).render(view, {
-      errors: errors.array(),
-      oldInput: req.body,
-      ...extraData,
-    });
+    try {
+      const data = buildData ? await buildData(req) : {};
+
+      return res.status(400).render(view, {
+        ...data,
+
+        errors: errors.array(),
+        oldInput: req.body,
+      });
+    } catch (err) {
+      return next(err);
+    }
   };
 };
 
