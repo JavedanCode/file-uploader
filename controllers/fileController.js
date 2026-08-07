@@ -53,7 +53,7 @@ const uploadFile = async (req, res, next) => {
 
 const getFileDetails = async (req, res, next) => {
   try {
-    const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
+    const file = req.file;
 
     if (!file) {
       return res.status(404).render("404", {
@@ -77,7 +77,7 @@ const getFileDetails = async (req, res, next) => {
 
 const downloadFile = async (req, res, next) => {
   try {
-    const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
+    const file = req.file;
 
     if (!file) {
       return res.status(404).render("404", {
@@ -97,7 +97,7 @@ const downloadFile = async (req, res, next) => {
 
 const renameFile = async (req, res, next) => {
   try {
-    const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
+    const file = req.file;
 
     await fileQueries.renameFileQuery(file.id, req.body.name);
 
@@ -113,7 +113,7 @@ const renameFile = async (req, res, next) => {
 
 const deleteFile = async (req, res, next) => {
   try {
-    const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
+    const file = req.file;
 
     try {
       await fs.unlink(file.path);
