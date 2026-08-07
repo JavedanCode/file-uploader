@@ -4,6 +4,18 @@ const fs = require("node:fs/promises");
 const fileQueries = require("../db/queries/fileQueries");
 
 // =====================================
+// HELPER
+// =====================================
+
+const redirectToFolder = (res, folder) => {
+  if (folder) {
+    return res.redirect(`/folder/${folder.id}`);
+  }
+
+  return res.redirect("/");
+};
+
+// =====================================
 // UPLOAD
 // =====================================
 
@@ -26,33 +38,36 @@ const uploadFile = async (req, res, next) => {
     });
 
     if (req.body.folderId) {
-      return res.redirect(`/folders/${req.body.folderId}`);
+      return res.redirect(`/folder/${req.body.folderId}`);
     }
 
-    return res.redirect("/folders");
+    return res.redirect("/");
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
 // =====================================
-// DETAILS
+// VIEW
 // =====================================
 
 const getFileDetails = async (req, res, next) => {
   try {
     const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
 
-    return res.render("files/details", {
-      title: file.name,
+    if (!file) {
+      return res.status(404).render("404", {
+        title: "Not Found",
+      });
+    }
 
-      file,
-
-      errors: [],
-      oldInput: {},
+    return res.sendFile(path.resolve(file.path), {
+      headers: {
+        "Content-Type": file.mimeType,
+      },
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -64,9 +79,15 @@ const downloadFile = async (req, res, next) => {
   try {
     const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
 
+    if (!file) {
+      return res.status(404).render("404", {
+        title: "Not Found",
+      });
+    }
+
     return res.download(file.path, file.originalName);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -78,15 +99,11 @@ const renameFile = async (req, res, next) => {
   try {
     const file = await fileQueries.getFileByIdQuery(req.params.id, req.user.id);
 
-    await fileQueries.renameFileQuery(req.params.id, req.body.name);
+    await fileQueries.renameFileQuery(file.id, req.body.name);
 
-    if (file.folder) {
-      return res.redirect(`/folders/${file.folder.id}`);
-    }
-
-    return res.redirect("/folders");
+    return redirectToFolder(res, file.folder);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -106,26 +123,18 @@ const deleteFile = async (req, res, next) => {
       }
     }
 
-    await fileQueries.deleteFileQuery(req.params.id);
+    await fileQueries.deleteFileQuery(file.id);
 
-    if (file.folder) {
-      return res.redirect(`/folders/${file.folder.id}`);
-    }
-
-    return res.redirect("/folders");
+    return redirectToFolder(res, file.folder);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
 module.exports = {
   uploadFile,
-
   getFileDetails,
-
   downloadFile,
-
   renameFile,
-
   deleteFile,
 };
