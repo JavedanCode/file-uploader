@@ -33,14 +33,14 @@ const findFolderInTree = (folders, folderId, parents = []) => {
 // =====================================
 
 const buildDashboardData = async (userId, folderId = null) => {
-  const sidebarFolders = await folderQueries.getFolderTreeQuery(userId);
-
   // =================================
   // ROOT
   // =================================
+
   if (folderId === null) {
     const [sidebarFolders, files] = await Promise.all([
       folderQueries.getFolderTreeQuery(userId),
+
       fileQueries.getRootFilesQuery(userId),
     ]);
 
@@ -66,13 +66,13 @@ const buildDashboardData = async (userId, folderId = null) => {
   // CURRENT FOLDER
   // =================================
 
+  const sidebarFolders = await folderQueries.getFolderTreeQuery(userId);
+
   const result = findFolderInTree(sidebarFolders, folderId);
 
   if (!result) {
     return null;
   }
-
-  const { path } = result;
 
   const folder = await folderQueries.getFolderContentsQuery(folderId, userId);
 
@@ -85,7 +85,7 @@ const buildDashboardData = async (userId, folderId = null) => {
 
     sidebarFolders,
 
-    breadcrumbs: path,
+    breadcrumbs: result.path,
 
     currentFolder: folder,
 
