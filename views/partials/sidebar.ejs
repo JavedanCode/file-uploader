@@ -1,0 +1,95 @@
+<div class="sidebar-content">
+
+    <div class="sidebar-actions">
+
+        <button
+            class="sidebar-action"
+            id="create-folder-btn"
+            type="button"
+        >
+            <span class="sidebar-action-icon">＋</span>
+            <span>New Folder</span>
+        </button>
+
+
+        <button
+            class="sidebar-action"
+            id="upload-file-btn"
+            type="button"
+        >
+            <span class="sidebar-action-icon">↑</span>
+            <span>New File</span>
+        </button>
+
+    </div>
+
+
+    <% if (currentFolder) { %>
+
+        <div class="sidebar-folder-actions">
+
+            <button
+                class="sidebar-action"
+                id="share-folder-btn"
+                type="button"
+            >
+                <span class="sidebar-action-icon">↗</span>
+                <span>Share Folder</span>
+            </button>
+
+
+            <button
+                class="sidebar-action"
+                id="rename-folder-btn"
+                type="button"
+                data-id="<%= currentFolder.id %>"
+                data-name="<%= currentFolder.name %>"
+            >
+                <span class="sidebar-action-icon">✎</span>
+                <span>Rename Folder</span>
+            </button>
+
+
+            <button
+                class="sidebar-action sidebar-action-danger delete-folder-btn"
+                id="delete-current-folder-btn"
+                type="button"
+                data-id="<%= currentFolder.id %>"
+                data-name="<%= currentFolder.name %>"
+            >
+                <span class="sidebar-action-icon">⌫</span>
+                <span>Delete Folder</span>
+            </button>
+
+        </div>
+
+    <% } %>
+
+
+    <div class="sidebar-divider"></div>
+
+
+    <nav
+        class="folder-tree"
+        aria-label="Folders"
+    >
+
+        <% if (sidebarFolders.length) { %>
+
+            <% sidebarFolders.forEach(folder => { %>
+
+                <%- include("folderNode", { folder }) %>
+
+            <% }) %>
+
+        <% } else { %>
+
+            <p class="sidebar-empty">
+                No folders
+            </p>
+
+        <% } %>
+
+    </nav>
+
+</div>

@@ -1,0 +1,69 @@
+<div class="modal hidden" id="create-folder-modal">
+
+    <div class="modal-content">
+
+        <button
+            class="modal-close close-modal"
+            type="button"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+        <h2>Create Folder</h2>
+
+        <form
+            action="/folder"
+            method="POST"
+        >
+
+            <div class="field">
+
+                <label for="folder-name">
+                    Folder Name
+                </label>
+
+                <input
+                    id="folder-name"
+                    type="text"
+                    name="name"
+                    maxlength="50"
+                    value="<%= oldInput?.name || '' %>"
+                    required
+                    autofocus
+                />
+
+            </div>
+
+            <input
+                type="hidden"
+                name="parentId"
+                value="<%= currentFolder ? currentFolder.id : '' %>"
+            />
+
+            <% if (errors.length) { %>
+
+                <div class="form-errors">
+
+                    <% errors.forEach(error => { %>
+
+                        <p><%= error.msg %></p>
+
+                    <% }) %>
+
+                </div>
+
+            <% } %>
+
+            <button
+                class="btn btn-primary"
+                type="submit"
+            >
+                Create Folder
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

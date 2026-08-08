@@ -1,0 +1,31 @@
+<div class="folder-node">
+
+    <a
+        href="/folder/<%= folder.id %>"
+        class="folder-link"
+    >
+
+        <span class="folder-icon">□</span>
+
+        <span class="folder-name">
+            <%= folder.name %>
+        </span>
+
+    </a>
+
+
+    <% if (folder.children && folder.children.length) { %>
+
+        <div class="folder-children">
+
+            <% folder.children.forEach(child => { %>
+
+                <%- include("folderNode", { folder: child }) %>
+
+            <% }) %>
+
+        </div>
+
+    <% } %>
+
+</div>

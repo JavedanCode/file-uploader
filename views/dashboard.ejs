@@ -1,0 +1,59 @@
+<meta charset="UTF-8" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title><%= title %> | JavedanDrive</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="/css/global.css" />
+
+<link rel="stylesheet" href="/css/dashboard.css" />
+
+<div class="dashboard">
+  <!-- HEADER -->
+
+  <header class="dashboard-header"><%- include("partials/header") %></header>
+
+  <!-- DASHBOARD CONTENT -->
+
+  <div class="dashboard-content">
+    <!-- SIDEBAR -->
+
+    <aside class="dashboard-sidebar"><%- include("partials/sidebar") %></aside>
+
+    <!-- WORKSPACE -->
+
+    <div class="dashboard-workspace">
+      <main class="dashboard-main">
+        <%- include("partials/breadcrumbs") %> <%- include("partials/fileTable")
+        %>
+      </main>
+
+      <footer class="dashboard-footer">
+        <%- include("partials/footer") %>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+
+<%- include("modals/createFolder") %> <%- include("modals/uploadFile") %> <%-
+include("modals/renameFolder") %> <%- include("modals/renameFile") %> <%-
+include("modals/deleteModal") %>
+
+<!-- <% if (currentFolder) { %>
+
+    <%- include("modals/shareFolder") %>
+
+<% } %> -->
+
+<script src="/js/dashboard.js"></script>

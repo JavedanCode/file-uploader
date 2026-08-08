@@ -1,0 +1,28 @@
+<nav
+    class="breadcrumbs"
+    aria-label="Breadcrumb"
+>
+
+    <a href="/">Root</a>
+
+    <% breadcrumbs.forEach((folder, index) => { %>
+
+        <span class="breadcrumb-separator">›</span>
+
+        <% if (index === breadcrumbs.length - 1) { %>
+
+            <span class="breadcrumb-current">
+                <%= folder.name %>
+            </span>
+
+        <% } else { %>
+
+            <a href="/folder/<%= folder.id %>">
+                <%= folder.name %>
+            </a>
+
+        <% } %>
+
+    <% }) %>
+
+</nav>

@@ -1,0 +1,87 @@
+<div
+    class="modal hidden"
+    id="upload-file-modal"
+>
+
+    <div class="modal-content">
+
+        <button
+            class="modal-close close-modal"
+            type="button"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+        <h2>
+
+            Upload File
+
+        </h2>
+
+        <form
+            action="/file"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <div class="field">
+
+                <label for="file">
+
+                    Choose File
+
+                </label>
+
+                <input
+                    id="file"
+                    type="file"
+                    name="file"
+                    required
+                />
+
+            </div>
+
+            <input
+                type="hidden"
+                name="folderId"
+                value="<%= currentFolder ? currentFolder.id : '' %>"
+            />
+
+            <% if (errors.length) { %>
+
+                <div class="form-errors">
+
+                    <% errors.forEach(error => { %>
+
+                        <p><%= error.msg %></p>
+
+                    <% }) %>
+
+                </div>
+
+            <% } %>
+
+            <div class="modal-actions">
+
+                <button
+                    class="btn btn-secondary close-modal"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    class="btn btn-primary"
+                    type="submit"
+                >
+                    Upload
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

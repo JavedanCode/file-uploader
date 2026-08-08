@@ -1,0 +1,88 @@
+<div
+    class="modal hidden"
+    id="rename-folder-modal"
+>
+
+    <div class="modal-content">
+
+        <button
+            class="modal-close close-modal"
+            type="button"
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+        <h2>
+
+            Rename Folder
+
+        </h2>
+
+        <form
+            id="rename-folder-form"
+            method="POST"
+        >
+
+            <input
+                type="hidden"
+                name="_method"
+                value="PATCH"
+            />
+
+            <div class="field">
+
+                <label for="rename-folder-input">
+
+                    Folder Name
+
+                </label>
+
+                <input
+                    id="rename-folder-input"
+                    type="text"
+                    name="name"
+                    maxlength="50"
+                    value="<%= oldInput?.name || '' %>"
+                    required
+                />
+
+            </div>
+
+            <% if (errors.length) { %>
+
+                <div class="form-errors">
+
+                    <% errors.forEach(error => { %>
+
+                        <p><%= error.msg %></p>
+
+                    <% }) %>
+
+                </div>
+
+            <% } %>
+
+            <div class="modal-actions">
+
+                <button
+                    class="btn btn-secondary close-modal"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    class="btn btn-primary"
+                    type="submit"
+                >
+                    Save
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

@@ -1,0 +1,210 @@
+<section class="file-table">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Name</th>
+
+                <th>Size</th>
+
+                <th>Format</th>
+
+                <th>Created</th>
+
+                <th class="actions-column"></th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            <% folders.forEach(folder => { %>
+
+                <tr>
+
+                    <td>
+
+                        <a
+                            href="/folder/<%= folder.id %>"
+                            class="file-name"
+                        >
+                            <span class="file-icon">□</span>
+                            <%= folder.name %>
+                        </a>
+
+                    </td>
+
+                    <td>—</td>
+
+                    <td>Folder</td>
+
+                    <td>
+                        <%= folder.createdAt.toLocaleDateString() %>
+                    </td>
+
+                    <td class="actions-column">
+
+                        <div class="actions-menu">
+
+                            <button
+                                class="action-toggle"
+                                type="button"
+                                aria-label="Folder actions"
+                            >
+                                ⋮
+                            </button>
+
+
+                            <div class="actions-dropdown">
+
+                                <button
+                                    class="rename-folder-btn"
+                                    type="button"
+                                    data-id="<%= folder.id %>"
+                                    data-name="<%= folder.name %>"
+                                >
+                                    Rename
+                                </button>
+
+
+                                <button
+                                    class="delete-folder-btn"
+                                    type="button"
+                                    data-id="<%= folder.id %>"
+                                    data-name="<%= folder.name %>"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            <% }) %>
+
+
+            <% files.forEach(file => { %>
+
+                <tr>
+
+                    <td>
+
+                        <a
+                            href="/file/<%= file.id %>"
+                            target="_blank"
+                            rel="noopener"
+                            class="file-name"
+                        >
+                            <span class="file-icon">□</span>
+                            <%= file.name %>
+                        </a>
+
+                    </td>
+
+                    <td>
+
+                        <%= (file.size / 1024).toFixed(1) %> KB
+
+                    </td>
+
+                    <td>
+
+                        <%= file.mimeType.split("/")[1] %>
+
+                    </td>
+
+                    <td>
+
+                        <%= file.createdAt.toLocaleDateString() %>
+
+                    </td>
+
+                    <td class="actions-column">
+
+                        <div class="actions-menu">
+
+                            <button
+                                class="action-toggle"
+                                type="button"
+                                aria-label="File actions"
+                            >
+                                ⋮
+                            </button>
+
+
+                            <div class="actions-dropdown">
+
+                                <a
+                                    href="/file/<%= file.id %>/download"
+                                >
+                                    Download
+                                </a>
+
+
+                                <button
+                                    class="rename-file-btn"
+                                    type="button"
+                                    data-id="<%= file.id %>"
+                                    data-name="<%= file.name %>"
+                                >
+                                    Rename
+                                </button>
+
+
+                                <button
+                                    class="delete-file-btn"
+                                    type="button"
+                                    data-id="<%= file.id %>"
+                                    data-name="<%= file.name %>"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            <% }) %>
+
+
+            <% if (!folders.length && !files.length) { %>
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty-state"
+                    >
+
+                        <div class="empty-state-title">
+                            This folder is empty
+                        </div>
+
+                        <div class="empty-state-text">
+                            Create a folder or upload a file to get started.
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            <% } %>
+
+        </tbody>
+
+    </table>
+
+</section>
