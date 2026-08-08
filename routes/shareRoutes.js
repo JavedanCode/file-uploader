@@ -11,7 +11,7 @@ const router = Router();
 // =====================================
 
 router.post(
-  "/folders/:id/share",
+  "/folder/:id/share",
   isAuthenticated,
   shareController.createShareLink,
 );
@@ -27,7 +27,7 @@ router.get("/share/:id", shareController.viewSharedFolder);
 // =====================================
 
 router.delete(
-  "/folders/:id/share",
+  "/folder/:id/share",
   isAuthenticated,
   shareController.deleteShareLink,
 );

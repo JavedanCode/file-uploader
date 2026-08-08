@@ -16,12 +16,18 @@ const buildDashboardData = require("../utils/buildDashboardData");
 const router = Router();
 
 // =====================================
+// AUTH
+// =====================================
+
+router.use(isAuthenticated);
+
+// =====================================
 // DASHBOARD
 // =====================================
 
-router.get("/", isAuthenticated, dashboardController.getRoot);
+router.get("/", dashboardController.getRoot);
 
-router.get("/folder/:id", isAuthenticated, dashboardController.getFolder);
+router.get("/folder/:id", dashboardController.getFolder);
 
 // =====================================
 // FOLDER CRUD
@@ -29,7 +35,6 @@ router.get("/folder/:id", isAuthenticated, dashboardController.getFolder);
 
 router.post(
   "/folder",
-  isAuthenticated,
   createFolderValidation,
   handleValidationErrors("dashboard", (req) =>
     buildDashboardData(req.user.id, req.body.parentId || null),
@@ -39,7 +44,6 @@ router.post(
 
 router.patch(
   "/folder/:id",
-  isAuthenticated,
   renameFolderValidation,
   handleValidationErrors("dashboard", (req) =>
     buildDashboardData(req.user.id, req.params.id),
@@ -49,7 +53,6 @@ router.patch(
 
 router.delete(
   "/folder/:id",
-  isAuthenticated,
   deleteFolderValidation,
   handleValidationErrors("dashboard", (req) =>
     buildDashboardData(req.user.id, req.params.id),
