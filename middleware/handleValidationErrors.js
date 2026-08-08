@@ -1,5 +1,17 @@
 const { validationResult } = require("express-validator");
 
+// =====================================
+// HELPERS
+// =====================================
+
+const isAjaxRequest = (req) => {
+  return req.xhr || req.get("Accept")?.includes("application/json");
+};
+
+// =====================================
+// VALIDATION ERROR HANDLER
+// =====================================
+
 const handleValidationErrors = (view, buildData = null) => {
   return async (req, res, next) => {
     const errors = validationResult(req);
@@ -8,6 +20,21 @@ const handleValidationErrors = (view, buildData = null) => {
       return next();
     }
 
+    // =====================================
+    // AJAX
+    // =====================================
+
+    if (isAjaxRequest(req)) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+
+    // =====================================
+    // NORMAL REQUEST
+    // =====================================
+
     try {
       const data = buildData ? await buildData(req) : {};
 
@@ -15,6 +42,7 @@ const handleValidationErrors = (view, buildData = null) => {
         ...data,
 
         errors: errors.array(),
+
         oldInput: req.body,
       });
     } catch (err) {

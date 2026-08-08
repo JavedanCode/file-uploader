@@ -13,8 +13,8 @@ const createShareLink = async (req, res, next) => {
     );
 
     if (!folder) {
-      return res.status(404).render("404", {
-        title: "Not Found",
+      return res.status(404).json({
+        error: "Folder not found.",
       });
     }
 
@@ -27,8 +27,8 @@ const createShareLink = async (req, res, next) => {
     const duration = durations[req.body.duration];
 
     if (!duration) {
-      return res.status(400).render("400", {
-        title: "Invalid Duration",
+      return res.status(400).json({
+        error: "Invalid share duration.",
       });
     }
 
@@ -38,15 +38,14 @@ const createShareLink = async (req, res, next) => {
 
     const share = await shareQueries.upsertShareLinkQuery(folder.id, expiresAt);
 
-    return res.render("share/success", {
-      title: "Folder Shared",
-
-      share,
-
+    return res.json({
+      success: true,
       shareId: share.id,
+      expiresAt: share.expiresAt,
+      shareUrl: `/share/${share.id}`,
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -72,11 +71,10 @@ const viewSharedFolder = async (req, res, next) => {
 
     return res.render("share/view", {
       title: share.folder.name,
-
       folder: share.folder,
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -99,9 +97,9 @@ const deleteShareLink = async (req, res, next) => {
 
     await shareQueries.deleteShareLinkQuery(folder.id);
 
-    return res.redirect(`/folders/${folder.id}`);
+    return res.redirect(`/folder/${folder.id}`);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 

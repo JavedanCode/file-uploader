@@ -2,14 +2,30 @@ const folderQueries = require("../db/queries/folderQueries");
 const buildDashboardData = require("../utils/buildDashboardData");
 
 // =====================================
-// HELPER
+// HELPERS
 // =====================================
-const redirectToParent = (res, parentId) => {
+
+const isAjaxRequest = (req) => {
+  return req.xhr || req.get("Accept")?.includes("application/json");
+};
+
+const getFolderRedirect = (parentId) => {
   if (parentId) {
-    return res.redirect(`/folder/${parentId}`);
+    return `/folder/${parentId}`;
   }
 
-  return res.redirect("/");
+  return "/";
+};
+
+const sendMutationResponse = (req, res, redirect) => {
+  if (isAjaxRequest(req)) {
+    return res.json({
+      success: true,
+      redirect,
+    });
+  }
+
+  return res.redirect(redirect);
 };
 
 // =====================================
@@ -60,7 +76,9 @@ const createFolder = async (req, res, next) => {
       parentId: parentId || null,
     });
 
-    return redirectToParent(res, parentId);
+    const redirect = getFolderRedirect(parentId);
+
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
@@ -76,7 +94,9 @@ const renameFolder = async (req, res, next) => {
 
     await folderQueries.renameFolderQuery(folder.id, req.body.name);
 
-    return redirectToParent(res, folder.parentId);
+    const redirect = getFolderRedirect(folder.parentId);
+
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
@@ -92,7 +112,9 @@ const deleteFolder = async (req, res, next) => {
 
     await folderQueries.deleteFolderQuery(folder.id);
 
-    return redirectToParent(res, folder.parentId);
+    const redirect = getFolderRedirect(folder.parentId);
+
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
@@ -101,10 +123,7 @@ const deleteFolder = async (req, res, next) => {
 module.exports = {
   getRoot,
   getFolder,
-
   createFolder,
-
   renameFolder,
-
   deleteFolder,
 };

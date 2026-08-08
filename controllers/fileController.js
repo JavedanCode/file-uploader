@@ -4,15 +4,30 @@ const fs = require("node:fs/promises");
 const fileQueries = require("../db/queries/fileQueries");
 
 // =====================================
-// HELPER
+// HELPERS
 // =====================================
 
-const redirectToFolder = (res, folder) => {
+const isAjaxRequest = (req) => {
+  return req.xhr || req.get("Accept")?.includes("application/json");
+};
+
+const getFolderRedirect = (folder) => {
   if (folder) {
-    return res.redirect(`/folder/${folder.id}`);
+    return `/folder/${folder.id}`;
   }
 
-  return res.redirect("/");
+  return "/";
+};
+
+const sendMutationResponse = (req, res, redirect) => {
+  if (isAjaxRequest(req)) {
+    return res.json({
+      success: true,
+      redirect,
+    });
+  }
+
+  return res.redirect(redirect);
 };
 
 // =====================================
@@ -22,6 +37,13 @@ const redirectToFolder = (res, folder) => {
 const uploadFile = async (req, res, next) => {
   try {
     const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        error: "Please select a file.",
+      });
+    }
 
     await fileQueries.createFileQuery({
       name: path.parse(file.originalname).name,
@@ -37,11 +59,9 @@ const uploadFile = async (req, res, next) => {
       folderId: req.body.folderId || null,
     });
 
-    if (req.body.folderId) {
-      return res.redirect(`/folder/${req.body.folderId}`);
-    }
+    const redirect = req.body.folderId ? `/folder/${req.body.folderId}` : "/";
 
-    return res.redirect("/");
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
@@ -101,7 +121,9 @@ const renameFile = async (req, res, next) => {
 
     await fileQueries.renameFileQuery(file.id, req.body.name);
 
-    return redirectToFolder(res, file.folder);
+    const redirect = getFolderRedirect(file.folder);
+
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
@@ -125,7 +147,9 @@ const deleteFile = async (req, res, next) => {
 
     await fileQueries.deleteFileQuery(file.id);
 
-    return redirectToFolder(res, file.folder);
+    const redirect = getFolderRedirect(file.folder);
+
+    return sendMutationResponse(req, res, redirect);
   } catch (err) {
     return next(err);
   }
