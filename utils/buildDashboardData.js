@@ -1,12 +1,44 @@
 const folderQueries = require("../db/queries/folderQueries");
 
-const buildDashboardData = async (userId, folderId = null) => {
-  if (folderId === null) {
-    const [sidebarFolders, folders] = await Promise.all([
-      folderQueries.getFolderTreeQuery(userId),
-      folderQueries.getRootFoldersQuery(userId),
-    ]);
+// =====================================
+// HELPERS
+// =====================================
 
+const findFolderInTree = (folders, folderId, parents = []) => {
+  for (const folder of folders) {
+    const currentPath = [...parents, folder];
+
+    if (folder.id === folderId) {
+      return {
+        folder,
+        path: currentPath,
+      };
+    }
+
+    if (folder.children.length > 0) {
+      const result = findFolderInTree(folder.children, folderId, currentPath);
+
+      if (result) {
+        return result;
+      }
+    }
+  }
+
+  return null;
+};
+
+// =====================================
+// DASHBOARD DATA
+// =====================================
+
+const buildDashboardData = async (userId, folderId = null) => {
+  const sidebarFolders = await folderQueries.getFolderTreeQuery(userId);
+
+  // =================================
+  // ROOT
+  // =================================
+
+  if (folderId === null) {
     return {
       title: "My Drive",
 
@@ -16,7 +48,7 @@ const buildDashboardData = async (userId, folderId = null) => {
 
       currentFolder: null,
 
-      folders,
+      folders: sidebarFolders,
 
       files: [],
 
@@ -25,11 +57,19 @@ const buildDashboardData = async (userId, folderId = null) => {
     };
   }
 
-  const [sidebarFolders, folder, breadcrumbs] = await Promise.all([
-    folderQueries.getFolderTreeQuery(userId),
-    folderQueries.getFolderContentsQuery(folderId, userId),
-    folderQueries.getFolderPathQuery(folderId, userId),
-  ]);
+  // =================================
+  // CURRENT FOLDER
+  // =================================
+
+  const result = findFolderInTree(sidebarFolders, folderId);
+
+  if (!result) {
+    return null;
+  }
+
+  const { path } = result;
+
+  const folder = await folderQueries.getFolderContentsQuery(folderId, userId);
 
   if (!folder) {
     return null;
@@ -40,7 +80,7 @@ const buildDashboardData = async (userId, folderId = null) => {
 
     sidebarFolders,
 
-    breadcrumbs,
+    breadcrumbs: path,
 
     currentFolder: folder,
 
