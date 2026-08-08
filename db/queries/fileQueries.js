@@ -45,6 +45,25 @@ const getFileByIdQuery = async (id, ownerId) => {
   });
 };
 
+const getRootFilesQuery = async (ownerId) => {
+  return prisma.file.findMany({
+    where: {
+      ownerId,
+      folderId: null,
+    },
+    select: {
+      id: true,
+      name: true,
+      size: true,
+      mimeType: true,
+      createdAt: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+};
+
 // =====================================
 // UPDATE
 // =====================================
@@ -106,6 +125,7 @@ module.exports = {
   createFileQuery,
 
   getFileByIdQuery,
+  getRootFilesQuery,
 
   updateFileUrlQuery,
   renameFileQuery,
