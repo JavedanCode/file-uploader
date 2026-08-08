@@ -1,9 +1,12 @@
 const folderQueries = require("../db/queries/folderQueries");
 
 const buildDashboardData = async (userId, folderId = null) => {
-  const sidebarFolders = await folderQueries.getFolderTreeQuery(userId);
-
   if (folderId === null) {
+    const [sidebarFolders, folders] = await Promise.all([
+      folderQueries.getFolderTreeQuery(userId),
+      folderQueries.getRootFoldersQuery(userId),
+    ]);
+
     return {
       title: "My Drive",
 
@@ -13,7 +16,7 @@ const buildDashboardData = async (userId, folderId = null) => {
 
       currentFolder: null,
 
-      folders: await folderQueries.getRootFoldersQuery(userId),
+      folders,
 
       files: [],
 
@@ -22,13 +25,15 @@ const buildDashboardData = async (userId, folderId = null) => {
     };
   }
 
-  const folder = await folderQueries.getFolderContentsQuery(folderId, userId);
+  const [sidebarFolders, folder, breadcrumbs] = await Promise.all([
+    folderQueries.getFolderTreeQuery(userId),
+    folderQueries.getFolderContentsQuery(folderId, userId),
+    folderQueries.getFolderPathQuery(folderId, userId),
+  ]);
 
   if (!folder) {
     return null;
   }
-
-  const breadcrumbs = await folderQueries.getFolderPathQuery(folderId, userId);
 
   return {
     title: folder.name,
