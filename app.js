@@ -6,9 +6,9 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const prisma = require("./config/prisma");
 
 const authRouter = require("./routes/authRoutes");
-const folderRouter = require("./routes/folder");
-const fileRouter = require("./routes/file");
-const shareRouter = require("./routes/shareRoutes");
+const dashboardRouter = require("./routes/dashboardRoutes");
+const fileRouter = require("./routes/fileRoutes");
+// const shareRouter = require("./routes/shareRoutes");
 
 require("dotenv").config();
 require("./config/passport");
@@ -74,9 +74,9 @@ app.use(passport.session());
 //           ROUTES
 //=========================================
 app.use("/auth", authRouter);
-app.use("/folders", folderRouter);
-app.use("/files", fileRouter);
-app.use("/", shareRouter);
+app.use("/", dashboardRouter);
+app.use("/file", fileRouter);
+// app.use("/", shareRouter);
 
 //=========================================
 //           ERROR HANDLER
