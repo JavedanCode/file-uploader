@@ -19,8 +19,10 @@ const upsertShareLinkQuery = async (folderId, expiresAt) => {
       expiresAt,
     },
 
-    include: {
-      folder: true,
+    select: {
+      id: true,
+      folderId: true,
+      expiresAt: true,
     },
   });
 };
@@ -58,23 +60,8 @@ const deleteShareLinkQuery = async (folderId) => {
   });
 };
 
-// =====================================
-// CHECKUP
-// =====================================
-const shareExistsQuery = async (folderId) => {
-  return prisma.shareLink.findUnique({
-    where: {
-      folderId,
-    },
-  });
-};
-
 module.exports = {
   upsertShareLinkQuery,
-
   getShareLinkQuery,
-
   deleteShareLinkQuery,
-
-  shareExistsQuery,
 };
