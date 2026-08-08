@@ -20,18 +20,11 @@ const getFolderByIdQuery = async (id, ownerId) => {
       id,
       ownerId,
     },
-  });
-};
-
-const getRootFoldersQuery = async (ownerId) => {
-  return prisma.folder.findMany({
-    where: {
-      ownerId,
-      parentId: null,
-    },
-
-    orderBy: {
-      name: "asc",
+    select: {
+      id: true,
+      name: true,
+      parentId: true,
+      createdAt: true,
     },
   });
 };
@@ -42,12 +35,17 @@ const getFolderContentsQuery = async (id, ownerId) => {
       id,
       ownerId,
     },
+    select: {
+      id: true,
+      name: true,
+      parentId: true,
+      createdAt: true,
 
-    include: {
       children: {
         select: {
           id: true,
           name: true,
+          parentId: true,
           createdAt: true,
         },
         orderBy: {
@@ -63,41 +61,12 @@ const getFolderContentsQuery = async (id, ownerId) => {
           mimeType: true,
           createdAt: true,
         },
-
         orderBy: {
           name: "asc",
         },
       },
     },
   });
-};
-
-const getFolderPathQuery = async (id, ownerId) => {
-  const path = [];
-
-  let current = await prisma.folder.findFirst({
-    where: {
-      id,
-      ownerId,
-    },
-  });
-
-  while (current) {
-    path.unshift(current);
-
-    if (!current.parentId) {
-      break;
-    }
-
-    current = await prisma.folder.findFirst({
-      where: {
-        id: current.parentId,
-        ownerId,
-      },
-    });
-  }
-
-  return path;
 };
 
 const getFolderTreeQuery = async (ownerId) => {
@@ -109,29 +78,29 @@ const getFolderTreeQuery = async (ownerId) => {
       id: true,
       name: true,
       parentId: true,
+      createdAt: true,
     },
-
     orderBy: {
       name: "asc",
     },
   });
 
-  const map = new Map();
+  const folderMap = new Map();
 
-  folders.forEach((folder) => {
-    map.set(folder.id, {
+  for (const folder of folders) {
+    folderMap.set(folder.id, {
       ...folder,
       children: [],
     });
-  });
+  }
 
   const tree = [];
 
-  folders.forEach((folder) => {
-    const current = map.get(folder.id);
+  for (const folder of folders) {
+    const current = folderMap.get(folder.id);
 
     if (folder.parentId) {
-      const parent = map.get(folder.parentId);
+      const parent = folderMap.get(folder.parentId);
 
       if (parent) {
         parent.children.push(current);
@@ -139,7 +108,7 @@ const getFolderTreeQuery = async (ownerId) => {
     } else {
       tree.push(current);
     }
-  });
+  }
 
   return tree;
 };
@@ -206,12 +175,10 @@ const folderNameExistsExceptQuery = async (ownerId, parentId, name, id) => {
       ownerId,
       parentId,
       name,
-
       NOT: {
         id,
       },
     },
-
     select: {
       id: true,
     },
@@ -222,9 +189,7 @@ module.exports = {
   createFolderQuery,
 
   getFolderByIdQuery,
-  getRootFoldersQuery,
   getFolderContentsQuery,
-  getFolderPathQuery,
   getFolderTreeQuery,
 
   renameFolderQuery,
